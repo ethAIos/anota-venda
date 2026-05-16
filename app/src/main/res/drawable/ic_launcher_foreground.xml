@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Caveat-style "c" rendered as a stylized arc + tail. Foreground stays in central 72dp -->
+    <path
+        android:strokeColor="#FAF6EF"
+        android:strokeWidth="9"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M72,40 C60,32 42,32 36,46 C30,60 36,76 50,78 C62,80 70,72 72,68" />
+</vector>

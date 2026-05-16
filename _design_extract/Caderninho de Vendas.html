@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Caderninho de Vendas — Mockups</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="tokens.css" />
+
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body { font-family: 'Nunito', system-ui, sans-serif; background: #f0eee9; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Design canvas + screens -->
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="widgets.jsx"></script>
+<script type="text/babel" src="homecontext.jsx"></script>
+<script type="text/babel" src="screens-b.jsx"></script>
+<script type="text/babel" src="screens-c.jsx"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="env,react">
+    const { DesignCanvas, DCSection, DCArtboard, DCPostIt } = window;
+    const PHONE_W = 390, PHONE_H = 844;
+
+    function App() {
+      return (
+        <DesignCanvas>
+          {/* ───────────────────────────────────────────────────── */}
+          {/* Bloco A — Widgets na home screen */}
+          {/* ───────────────────────────────────────────────────── */}
+          <DCSection
+            id="a"
+            title="Bloco A · Widgets na home"
+            subtitle="cada widget mostrado em contexto de tela inicial"
+          >
+            <DCArtboard id="a2" label="A2 · Pagam hoje (4×2) — hero" width={PHONE_W} height={PHONE_H}>
+              <WidgetStage>
+                <WidgetA2 w={358} h={184} />
+              </WidgetStage>
+            </DCArtboard>
+
+            <DCArtboard id="a2-empty" label="A2 · Estado vazio" width={PHONE_W} height={PHONE_H}>
+              <WidgetStage>
+                <WidgetA2 empty w={358} h={184} />
+              </WidgetStage>
+            </DCArtboard>
+
+            <DCArtboard id="a1" label="A1 · + Pedido (2×1)" width={PHONE_W} height={PHONE_H}>
+              <WidgetStage>
+                <WidgetA1 w={178} h={94} />
+              </WidgetStage>
+            </DCArtboard>
+
+            <DCArtboard id="a3" label="A3 · Em aberto (4×2)" width={PHONE_W} height={PHONE_H}>
+              <WidgetStage>
+                <WidgetA3 w={358} h={184} />
+              </WidgetStage>
+            </DCArtboard>
+
+            <DCArtboard id="a4" label="A4 · Home com tudo junto" width={PHONE_W} height={PHONE_H}>
+              <ScreenA4 />
+            </DCArtboard>
+          </DCSection>
+
+          {/* ───────────────────────────────────────────────────── */}
+          {/* Bloco B — Telas do app */}
+          {/* ───────────────────────────────────────────────────── */}
+          <DCSection
+            id="b"
+            title="Bloco B · Telas do app"
+            subtitle="acessadas via widget · 390 × 844"
+          >
+            <DCArtboard id="b1" label="B1 · Anotar venda" width={PHONE_W} height={PHONE_H}>
+              <ScreenB1 />
+            </DCArtboard>
+
+            <DCArtboard id="b1-conf" label="B1 · Confirmação" width={PHONE_W} height={PHONE_H}>
+              <ScreenB1 confirmation />
+            </DCArtboard>
+
+            <DCArtboard id="b2" label="B2 · Detalhes do cliente" width={PHONE_W} height={PHONE_H}>
+              <ScreenB2 />
+            </DCArtboard>
+
+            <DCArtboard id="b3" label="B3 · Detalhes do pedido" width={PHONE_W} height={PHONE_H}>
+              <ScreenB3 />
+            </DCArtboard>
+
+            <DCArtboard id="b4" label="B4 · Cobranças (hoje)" width={PHONE_W} height={PHONE_H}>
+              <ScreenB4 />
+            </DCArtboard>
+
+            <DCArtboard id="b4-picker" label="B4 · Calendário aberto" width={PHONE_W} height={PHONE_H}>
+              <ScreenB4 pickerOpen />
+            </DCArtboard>
+
+            <DCArtboard id="b4-overdue" label="B4 · Dia atrasado" width={PHONE_W} height={PHONE_H}>
+              <ScreenB4 pickerOpen selectedDay="overdue" />
+            </DCArtboard>
+
+            <DCArtboard id="b4-empty" label="B4 · Dia tranquilo" width={PHONE_W} height={PHONE_H}>
+              <ScreenB4 pickerOpen selectedDay="empty" />
+            </DCArtboard>
+
+            <DCArtboard id="b5" label="B5 · Ajustes" width={PHONE_W} height={PHONE_H}>
+              <ScreenB5 />
+            </DCArtboard>
+          </DCSection>
+
+          {/* ───────────────────────────────────────────────────── */}
+          {/* Bloco C — Estados especiais */}
+          {/* ───────────────────────────────────────────────────── */}
+          <DCSection
+            id="c"
+            title="Bloco C · Estados especiais"
+            subtitle="onboarding, vazios, bottom sheets"
+          >
+            <DCArtboard id="c1-1" label="C1 · Onboarding (1)" width={PHONE_W} height={PHONE_H}>
+              <ScreenC1 step={1} />
+            </DCArtboard>
+
+            <DCArtboard id="c1-2" label="C1 · Onboarding (2)" width={PHONE_W} height={PHONE_H}>
+              <ScreenC1 step={2} />
+            </DCArtboard>
+
+            <DCArtboard id="c2" label="C2 · Em aberto vazio" width={PHONE_W} height={PHONE_H}>
+              <ScreenC2 />
+            </DCArtboard>
+
+            <DCArtboard id="c3" label="C3 · Bottom sheet Recebi" width={PHONE_W} height={PHONE_H}>
+              <ScreenC3 />
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    // Wait for all the babel scripts to register their exports.
+    function mount() {
+      if (!window.WidgetA2 || !window.ScreenB1 || !window.ScreenC1 || !window.ScreenA4 || !window.DesignCanvas) {
+        return setTimeout(mount, 30);
+      }
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    }
+    mount();
+  </script>
+</body>
+</html>

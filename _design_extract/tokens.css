@@ -1,0 +1,77 @@
+/* Caderninho de Vendas — design tokens */
+:root {
+  --paper: #FAF6EF;
+  --paper-2: #F5EFE3;
+  --ink: #2A2724;
+  --ink-2: #7A736B;
+  --rule: #E8DFD0;
+  --rule-2: #DCD2BD;
+  --green: #3F7D55;
+  --green-soft: #E5EEDF;
+  --red: #B5462E;
+  --red-soft: #F3DED5;
+  --highlight: #F4E5B8;
+  --highlight-deep: #E9D58B;
+
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+
+  --shadow-soft: 0 1px 2px rgba(60, 50, 30, 0.05), 0 6px 22px rgba(60, 50, 30, 0.06);
+  --shadow-paper: 0 1px 0 rgba(60, 50, 30, 0.04), 0 2px 6px rgba(60, 50, 30, 0.06);
+
+  --font-body: 'Nunito', system-ui, sans-serif;
+  --font-hand: 'Caveat', cursive;
+}
+
+/* Subtle paper grain (data-uri) — applied via background-image in components */
+.paper-bg {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(rgba(180, 160, 120, 0.06) 1px, transparent 1.2px),
+    radial-gradient(rgba(180, 160, 120, 0.04) 1px, transparent 1.5px);
+  background-size: 6px 6px, 11px 11px;
+  background-position: 0 0, 3px 4px;
+}
+
+/* Notebook ruled lines — apply as a layered background */
+.ruled {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 31px,
+    var(--rule) 31px,
+    var(--rule) 32px
+  );
+}
+
+/* Reset for screen artboards */
+.screen {
+  font-family: var(--font-body);
+  color: var(--ink);
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen, .screen * {
+  box-sizing: border-box;
+}
+
+/* Tabular numerals for currency */
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Small status dot */
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.dot-red { background: var(--red); }
+.dot-amber { background: #C58A2E; }
+.dot-green { background: var(--green); }
