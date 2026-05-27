@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,7 +27,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.caderninho.vendas.ui.components.AvatarTone
+import com.caderninho.vendas.ui.components.CaderninhoInteraction
 import com.caderninho.vendas.ui.components.InitialAvatar
+import com.caderninho.vendas.ui.components.PaperDialogActions
 import com.caderninho.vendas.ui.theme.Ink
 import com.caderninho.vendas.ui.theme.InkSoft
 import com.caderninho.vendas.ui.theme.NunitoFamily
@@ -86,10 +88,11 @@ fun EditCustomerDialog(
                         val borderWidth = if (t == draftTone) 2.dp else 1.dp
                         Row(
                             modifier = Modifier
-                                .size(44.dp)
+                                .size(CaderninhoInteraction.minTouchTarget)
                                 .selectable(
                                     selected = t == draftTone,
                                     onClick = { draftTone = t },
+                                    role = Role.RadioButton,
                                 )
                                 .border(borderWidth, borderColor, CircleShape)
                                 .padding(4.dp),
@@ -105,19 +108,18 @@ fun EditCustomerDialog(
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = {
+            PaperDialogActions(
+                onDismiss = onDismiss,
+                confirmText = "Salvar",
+                confirmEnabled = draftName.isNotBlank(),
+                onConfirm = {
                     onSave(
                         draftName.trim(),
                         draftPhone.trim().takeIf { it.isNotBlank() },
                         draftTone,
                     )
                 },
-                enabled = draftName.isNotBlank(),
-            ) { Text("Salvar") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            )
         },
         containerColor = Paper,
         textContentColor = Ink,

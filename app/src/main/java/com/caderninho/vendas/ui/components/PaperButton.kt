@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
@@ -21,6 +22,7 @@ import com.caderninho.vendas.ui.theme.CaderninhoShapes
 import com.caderninho.vendas.ui.theme.Green
 import com.caderninho.vendas.ui.theme.GreenSoft
 import com.caderninho.vendas.ui.theme.Ink
+import com.caderninho.vendas.ui.theme.InkSoft
 import com.caderninho.vendas.ui.theme.NunitoFamily
 import com.caderninho.vendas.ui.theme.Paper
 import com.caderninho.vendas.ui.theme.PaperAlt
@@ -37,16 +39,21 @@ fun PrimaryButton(
     modifier: Modifier = Modifier,
     color: PrimaryColor = PrimaryColor.GREEN,
     fillWidth: Boolean = true,
+    enabled: Boolean = true,
     leadingIcon: (@Composable () -> Unit)? = null,
 ) {
     val container = if (color == PrimaryColor.GREEN) Green else Red
     Button(
         onClick = onClick,
-        modifier = if (fillWidth) modifier.fillMaxWidth() else modifier,
+        enabled = enabled,
+        modifier = (if (fillWidth) modifier.fillMaxWidth() else modifier)
+            .defaultMinSize(minHeight = CaderninhoInteraction.minTouchTarget),
         shape = CaderninhoShapes.medium,
         colors = ButtonDefaults.buttonColors(
             containerColor = container,
             contentColor = Paper,
+            disabledContainerColor = Rule,
+            disabledContentColor = InkSoft,
         ),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
     ) {
@@ -76,6 +83,7 @@ fun GhostButton(
     modifier: Modifier = Modifier,
     color: GhostColor = GhostColor.INK,
     fillWidth: Boolean = false,
+    enabled: Boolean = true,
     leadingIcon: (@Composable () -> Unit)? = null,
 ) {
     val (bg, fg, border) = when (color) {
@@ -86,7 +94,9 @@ fun GhostButton(
     }
     OutlinedButton(
         onClick = onClick,
-        modifier = if (fillWidth) modifier.fillMaxWidth() else modifier,
+        enabled = enabled,
+        modifier = (if (fillWidth) modifier.fillMaxWidth() else modifier)
+            .defaultMinSize(minHeight = CaderninhoInteraction.minTouchTarget),
         shape = CaderninhoShapes.small,
         colors = ButtonDefaults.outlinedButtonColors(
             containerColor = bg,

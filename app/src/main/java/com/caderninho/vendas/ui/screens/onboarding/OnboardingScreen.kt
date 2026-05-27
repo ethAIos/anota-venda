@@ -20,7 +20,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -38,8 +37,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.caderninho.vendas.ui.components.BrandMark
+import com.caderninho.vendas.ui.components.GhostButton
+import com.caderninho.vendas.ui.components.GhostColor
 import com.caderninho.vendas.ui.components.PaperScaffold
 import com.caderninho.vendas.ui.components.PrimaryButton
+import com.caderninho.vendas.ui.components.paperScaffoldContentPadding
 import com.caderninho.vendas.ui.theme.Green
 import com.caderninho.vendas.ui.theme.Ink
 import com.caderninho.vendas.ui.theme.InkSoft
@@ -60,17 +62,15 @@ fun OnboardingScreen(onFinish: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .paperScaffoldContentPadding(padding)
                 .padding(horizontal = 22.dp, vertical = 20.dp),
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = onFinish) {
-                    Text(
-                        "pular",
-                        color = InkSoft,
-                        style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp),
-                    )
-                }
+                GhostButton(
+                    text = "pular",
+                    color = GhostColor.PAPER,
+                    onClick = onFinish,
+                )
             }
 
             HorizontalPager(
@@ -139,7 +139,7 @@ private fun OnboardingCopy(page: Int) {
                 fontFamily = NunitoFamily,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = if (page == 0) 30.sp else 28.sp,
-                letterSpacing = (-0.5).sp,
+                letterSpacing = 0.sp,
                 lineHeight = 36.sp,
             ),
         )

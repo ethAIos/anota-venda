@@ -1,6 +1,5 @@
 package com.caderninho.vendas.ui.screens.customer
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,9 +20,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.caderninho.vendas.ui.components.GhostButton
-import com.caderninho.vendas.ui.components.GhostColor
-import com.caderninho.vendas.ui.components.PrimaryButton
+import com.caderninho.vendas.ui.components.PaperDialogActions
+import com.caderninho.vendas.ui.components.PaperSheetContent
 import com.caderninho.vendas.ui.components.formatBrl
 import com.caderninho.vendas.ui.theme.Green
 import com.caderninho.vendas.ui.theme.Ink
@@ -49,13 +47,7 @@ fun ReceivePaymentSheet(
         sheetState = sheetState,
         containerColor = Paper,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 22.dp, vertical = 12.dp)
-                .padding(bottom = 28.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
-        ) {
+        PaperSheetContent {
             Column {
                 Text(
                     "RECEBI DE",
@@ -66,7 +58,7 @@ fun ReceivePaymentSheet(
                     customerName,
                     color = Ink,
                     modifier = Modifier.padding(top = 4.dp),
-                    style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp, letterSpacing = (-0.3).sp),
+                    style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp, letterSpacing = 0.sp),
                 )
                 Text(
                     "$productLabel · ${describeDue(dueDate)}",
@@ -110,7 +102,7 @@ fun ReceivePaymentSheet(
                             fontFamily = NunitoFamily,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 44.sp,
-                            letterSpacing = (-1.5).sp,
+                            letterSpacing = 0.sp,
                             fontFeatureSettings = "tnum",
                         ),
                     )
@@ -123,16 +115,11 @@ fun ReceivePaymentSheet(
                 )
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                GhostButton(text = "Cancelar", color = GhostColor.PAPER, onClick = onDismiss)
-                Spacer(modifier = Modifier.size(0.dp))
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    PrimaryButton(text = "Confirmar", onClick = onConfirm)
-                }
-            }
+            PaperDialogActions(
+                onDismiss = onDismiss,
+                confirmText = "Confirmar",
+                onConfirm = onConfirm,
+            )
         }
     }
 }

@@ -146,7 +146,7 @@ private fun A3Row(row: OpenInstallmentRow) {
         modifier = GlanceModifier
             .fillMaxWidth()
             .clickable(actionStartActivity(deepLinkIntent(context, "customer/${row.customer.id}")))
-            .padding(vertical = 4.dp),
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(modifier = GlanceModifier.size(6.dp).background(ColorProvider(dotColor)).cornerRadius(3.dp)) {}
@@ -177,6 +177,15 @@ private fun A3Row(row: OpenInstallmentRow) {
                 color = ColorProvider(Ink),
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp,
+            ),
+        )
+        Spacer(modifier = GlanceModifier.size(4.dp))
+        Text(
+            ">",
+            style = TextStyle(
+                color = ColorProvider(InkSoft),
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp,
             ),
         )
     }

@@ -3,7 +3,6 @@ package com.caderninho.vendas.ui.screens.customer
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
@@ -25,10 +25,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,7 +42,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,13 +54,16 @@ import com.caderninho.vendas.ui.components.GhostButton
 import com.caderninho.vendas.ui.components.GhostColor
 import com.caderninho.vendas.ui.components.InitialAvatar
 import com.caderninho.vendas.ui.components.Money
+import com.caderninho.vendas.ui.components.PaperDialogActions
+import com.caderninho.vendas.ui.components.PaperIconButton
+import com.caderninho.vendas.ui.components.PaperListRow
 import com.caderninho.vendas.ui.components.PaperScaffold
 import com.caderninho.vendas.ui.components.PaperTopBar
 import com.caderninho.vendas.ui.components.PrimaryButton
-import com.caderninho.vendas.ui.components.PrimaryColor
 import com.caderninho.vendas.ui.components.StatusDot
 import com.caderninho.vendas.ui.components.TopBarLeading
 import com.caderninho.vendas.ui.components.formatBrl
+import com.caderninho.vendas.ui.components.paperScaffoldContentPadding
 import com.caderninho.vendas.ui.theme.Green
 import com.caderninho.vendas.ui.theme.Ink
 import com.caderninho.vendas.ui.theme.InkSoft
@@ -109,9 +109,7 @@ fun CustomerDetailScreen(
                 leading = TopBarLeading.BACK,
                 onLeading = onBack,
                 actions = {
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Mais", tint = Ink)
-                    }
+                    PaperIconButton(Icons.Default.MoreVert, "Mais", { showMenu = true })
                     DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false },
@@ -186,7 +184,7 @@ fun CustomerDetailScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .paperScaffoldContentPadding(padding),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 22.dp, end = 22.dp, bottom = 24.dp, top = 4.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
@@ -362,17 +360,12 @@ private fun DeleteCustomerDialog(
             )
         },
         confirmButton = {
-            Box(modifier = Modifier.padding(end = 8.dp)) {
-                PrimaryButton(
-                    text = "Excluir",
-                    color = PrimaryColor.RED,
-                    fillWidth = false,
-                    onClick = onConfirm,
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            PaperDialogActions(
+                onDismiss = onDismiss,
+                confirmText = "Excluir",
+                destructive = true,
+                onConfirm = onConfirm,
+            )
         },
         containerColor = Paper,
         textContentColor = Ink,
@@ -392,37 +385,18 @@ private fun OrderRow(os: CustomerOrderSummary, onClick: () -> Unit) {
         OrderStatus.PAID -> "pago"
         else -> describeDue(os.installments.firstOrNull { it.paidAt == null }?.dueDate ?: os.order.createdAt)
     }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(Paper)
-            .border(1.dp, Rule, RoundedCornerShape(14.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        StatusDot(tone = tone)
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                os.order.what,
-                color = Ink,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 14.5.sp),
+    PaperListRow(
+        title = os.order.what,
+        subtitle = "${formatDayMonth(os.order.createdAt)} · $descriptor",
+        onClick = onClick,
+        leading = { StatusDot(tone = tone) },
+        trailing = {
+            Money(
+                os.order.totalCents,
+                color = if (os.status == OrderStatus.PAID) InkSoft else Ink,
+                size = 15.sp,
             )
-            Text(
-                "${formatDayMonth(os.order.createdAt)} · $descriptor",
-                color = if (os.status == OrderStatus.OVERDUE) Red else InkSoft,
-                modifier = Modifier.padding(top = 1.dp),
-                style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.SemiBold, fontSize = 12.sp),
-            )
-        }
-        Money(
-            os.order.totalCents,
-            color = if (os.status == OrderStatus.PAID) InkSoft else Ink,
-            size = 15.sp,
-        )
-    }
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = InkSoft, modifier = Modifier.size(20.dp))
+        },
+    )
 }

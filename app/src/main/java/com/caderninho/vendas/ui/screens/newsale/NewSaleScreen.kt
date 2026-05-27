@@ -3,7 +3,6 @@ package com.caderninho.vendas.ui.screens.newsale
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -25,7 +25,6 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,13 +49,16 @@ import com.caderninho.vendas.ui.components.GhostButton
 import com.caderninho.vendas.ui.components.GhostColor
 import com.caderninho.vendas.ui.components.Money
 import com.caderninho.vendas.ui.components.MoneyVisualTransformation
+import com.caderninho.vendas.ui.components.PaperDialogActions
 import com.caderninho.vendas.ui.components.PaperInput
+import com.caderninho.vendas.ui.components.PaperInteractiveSurface
 import com.caderninho.vendas.ui.components.PaperScaffold
 import com.caderninho.vendas.ui.components.PaperTopBar
 import com.caderninho.vendas.ui.components.PrimaryButton
 import com.caderninho.vendas.ui.components.Stepper
 import com.caderninho.vendas.ui.components.ToggleOption
 import com.caderninho.vendas.ui.components.TopBarLeading
+import com.caderninho.vendas.ui.components.paperScaffoldContentPadding
 import com.caderninho.vendas.ui.theme.Green
 import com.caderninho.vendas.ui.theme.GreenSoft
 import com.caderninho.vendas.ui.theme.Ink
@@ -66,9 +68,10 @@ import com.caderninho.vendas.ui.theme.NunitoFamily
 import com.caderninho.vendas.ui.theme.Paper
 import com.caderninho.vendas.ui.theme.PaperAlt
 import com.caderninho.vendas.ui.theme.Rule
+import com.caderninho.vendas.util.toDatePickerLocalDate
+import com.caderninho.vendas.util.toDatePickerMillis
 import com.caderninho.vendas.util.formatDayMonth
 import java.time.LocalDate
-import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,7 +103,7 @@ fun NewSaleScreen(
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
+                    .paperScaffoldContentPadding(padding),
             )
         } else {
             FormContent(
@@ -108,7 +111,7 @@ fun NewSaleScreen(
                 vm = vm,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
+                    .paperScaffoldContentPadding(padding),
             )
         }
     }
@@ -124,6 +127,7 @@ private fun FormContent(
     var showDatePicker by remember { mutableStateOf(false) }
     Column(
         modifier = modifier
+            .imePadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 22.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(22.dp),
@@ -203,24 +207,26 @@ private fun FormContent(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showDatePicker = true },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Ink, modifier = Modifier.size(18.dp))
-                    Text(
-                        "Quando paga?",
-                        color = Ink,
-                        style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp),
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        formatDayMonth(state.dueDate),
-                        color = Ink,
-                        style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
-                    )
+                    PaperInteractiveSurface(
+                        onClick = { showDatePicker = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        containerColor = Paper,
+                    ) {
+                        Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Ink, modifier = Modifier.size(18.dp))
+                        Text(
+                            "Quando paga?",
+                            color = Ink,
+                            modifier = Modifier.weight(1f),
+                            style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp),
+                        )
+                        Text(
+                            formatDayMonth(state.dueDate),
+                            color = Ink,
+                            style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
+                        )
+                    }
                 }
                 Column {
                     Text(
@@ -245,22 +251,21 @@ private fun FormContent(
     }
 
     if (showDatePicker) {
-        val zone = ZoneId.systemDefault()
-        val initial = state.dueDate.atStartOfDay(zone).toInstant().toEpochMilli()
+        val initial = state.dueDate.toDatePickerMillis()
         val picker = rememberDatePickerState(initialSelectedDateMillis = initial)
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
-                TextButton(onClick = {
-                    picker.selectedDateMillis?.let { millis ->
-                        val date = java.time.Instant.ofEpochMilli(millis).atZone(zone).toLocalDate()
-                        vm.onDueDate(date)
-                    }
-                    showDatePicker = false
-                }) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
+                PaperDialogActions(
+                    onDismiss = { showDatePicker = false },
+                    confirmText = "OK",
+                    onConfirm = {
+                        picker.selectedDateMillis?.let { millis ->
+                            vm.onDueDate(millis.toDatePickerLocalDate())
+                        }
+                        showDatePicker = false
+                    },
+                )
             },
         ) {
             DatePicker(state = picker)

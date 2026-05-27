@@ -2,7 +2,6 @@ package com.caderninho.vendas.ui.screens.payingtoday
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,9 +28,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -59,9 +57,13 @@ import com.caderninho.vendas.data.repo.PayingTodayRow
 import com.caderninho.vendas.ui.components.AvatarTone
 import com.caderninho.vendas.ui.components.InitialAvatar
 import com.caderninho.vendas.ui.components.Money
+import com.caderninho.vendas.ui.components.PaperIconButton
+import com.caderninho.vendas.ui.components.PaperInteractiveSurface
 import com.caderninho.vendas.ui.components.PaperScaffold
 import com.caderninho.vendas.ui.components.PaperTopBar
+import com.caderninho.vendas.ui.components.PrimaryButton
 import com.caderninho.vendas.ui.components.TopBarLeading
+import com.caderninho.vendas.ui.components.paperScaffoldContentPadding
 import com.caderninho.vendas.ui.screens.customer.ReceivePaymentSheet
 import com.caderninho.vendas.ui.theme.Green
 import com.caderninho.vendas.ui.theme.Ink
@@ -105,38 +107,32 @@ fun PayingTodayScreen(
                 title = "Cobranças",
                 leading = TopBarLeading.NONE,
                 actions = {
-                    IconButton(onClick = vm::toggleSearch) {
-                        Icon(
-                            imageVector = if (state.searchOpen) Icons.Default.Close else Icons.Default.Search,
-                            contentDescription = if (state.searchOpen) "Fechar busca" else "Buscar",
-                            tint = Ink,
-                        )
-                    }
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Ajustes", tint = Ink)
-                    }
+                    PaperIconButton(
+                        icon = if (state.searchOpen) Icons.Default.Close else Icons.Default.Search,
+                        contentDescription = if (state.searchOpen) "Fechar busca" else "Buscar",
+                        onClick = vm::toggleSearch,
+                    )
+                    PaperIconButton(
+                        icon = Icons.Default.Settings,
+                        contentDescription = "Ajustes",
+                        onClick = onOpenSettings,
+                    )
                 },
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
+            PrimaryButton(
+                text = "Anotar venda",
                 onClick = onOpenNewSale,
-                containerColor = Green,
-                contentColor = Paper,
-                icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = {
-                    Text(
-                        "Anotar venda",
-                        style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 15.sp),
-                    )
-                },
+                fillWidth = false,
+                leadingIcon = { Icon(Icons.Default.Add, contentDescription = null, tint = Paper, modifier = Modifier.size(18.dp)) },
             )
         },
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .paperScaffoldContentPadding(padding),
         ) {
             DateControls(
                 state = state,
@@ -251,16 +247,16 @@ private fun DatePill(
     onClick: () -> Unit,
 ) {
     val shape = RoundedCornerShape(12.dp)
-    Row(
+    PaperInteractiveSurface(
+        onClick = onClick,
         modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(if (open) Paper else PaperAlt)
-            .border(1.dp, if (open) Ink else Rule, shape)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+            .fillMaxWidth(),
+        selected = open,
+        containerColor = PaperAlt,
+        selectedContainerColor = Paper,
+        borderColor = if (open) Ink else Rule,
+        shape = shape,
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
     ) {
         Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Ink, modifier = Modifier.size(18.dp))
         Column(modifier = Modifier.weight(1f)) {
@@ -361,12 +357,7 @@ private fun WeekPicker(
 
 @Composable
 private fun WeekArrow(icon: ImageVector, contentDescription: String, onClick: () -> Unit) {
-    IconButton(
-        onClick = onClick,
-        modifier = Modifier.size(28.dp),
-    ) {
-        Icon(icon, contentDescription = contentDescription, tint = InkSoft, modifier = Modifier.size(18.dp))
-    }
+    PaperIconButton(icon = icon, contentDescription = contentDescription, onClick = onClick, tint = InkSoft)
 }
 
 @Composable
@@ -390,39 +381,46 @@ private fun WeekDayCell(
         summary.totalCents > 0 -> Green
         else -> InkSoft
     }
-    Column(
+    Surface(
+        onClick = onClick,
         modifier = modifier
             .clip(shape)
-            .background(bg)
             .border(
-                width = if (today && !selected) 1.5.dp else 1.5.dp,
+                width = 1.5.dp,
                 color = if (today && !selected) Green else Color.Transparent,
                 shape = shape,
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 2.dp, vertical = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(3.dp),
+            ),
+        shape = shape,
+        color = bg,
+        contentColor = primary,
     ) {
-        Text(
-            text = WEEKDAY_LABELS[date.dayOfWeek.value - 1],
-            color = secondary,
-            maxLines = 1,
-            style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 10.sp),
-        )
-        Text(
-            text = date.dayOfMonth.toString(),
-            color = primary,
-            maxLines = 1,
-            style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, lineHeight = 17.sp),
-        )
-        Text(
-            text = if (summary.totalCents > 0) compactMoney(summary.totalCents) else "—",
-            color = indicator,
-            maxLines = 1,
-            textAlign = TextAlign.Center,
-            style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 9.5.sp),
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 2.dp, vertical = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(3.dp),
+        ) {
+            Text(
+                text = WEEKDAY_LABELS[date.dayOfWeek.value - 1],
+                color = secondary,
+                maxLines = 1,
+                style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 10.sp),
+            )
+            Text(
+                text = date.dayOfMonth.toString(),
+                color = primary,
+                maxLines = 1,
+                style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, lineHeight = 17.sp),
+            )
+            Text(
+                text = if (summary.totalCents > 0) compactMoney(summary.totalCents) else "-",
+                color = indicator,
+                maxLines = 1,
+                textAlign = TextAlign.Center,
+                style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 9.5.sp),
+            )
+        }
     }
 }
 
@@ -466,13 +464,11 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit) {
             },
         )
         if (query.isNotBlank()) {
-            Icon(
-                Icons.Default.Close,
+            PaperIconButton(
+                icon = Icons.Default.Close,
                 contentDescription = "Limpar busca",
+                onClick = { onQueryChange("") },
                 tint = InkSoft,
-                modifier = Modifier
-                    .size(18.dp)
-                    .clickable { onQueryChange("") },
             )
         }
     }
@@ -567,12 +563,11 @@ private fun PayingRowCard(
             .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onTap),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        PaperInteractiveSurface(
+            onClick = onTap,
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = PaperAlt,
+            borderColor = Rule,
         ) {
             InitialAvatar(
                 name = row.customer.name,
@@ -597,6 +592,7 @@ private fun PayingRowCard(
                 )
             }
             Money(row.installment.amountCents, color = if (overdue) Red else Ink, size = 17.sp)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = InkSoft, modifier = Modifier.size(20.dp))
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -643,23 +639,30 @@ private fun ActionButton(
     onClick: () -> Unit,
 ) {
     val shape = RoundedCornerShape(10.dp)
-    Row(
+    Surface(
+        onClick = onClick,
         modifier = modifier
-            .clip(shape)
-            .background(bg)
-            .then(if (border) Modifier.border(1.dp, Rule, shape) else Modifier)
-            .clickable(onClick = onClick)
-            .padding(vertical = 10.dp, horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically,
+            .clip(shape),
+        shape = shape,
+        color = bg,
+        contentColor = fg,
+        border = if (border) androidx.compose.foundation.BorderStroke(1.dp, Rule) else null,
     ) {
-        Icon(icon, contentDescription = null, tint = fg, modifier = Modifier.size(16.dp))
-        Text(
-            label,
-            color = fg,
-            maxLines = 1,
-            style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 13.5.sp),
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp, horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(icon, contentDescription = null, tint = fg, modifier = Modifier.size(16.dp))
+            Text(
+                label,
+                color = fg,
+                maxLines = 1,
+                style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 13.5.sp),
+            )
+        }
     }
 }
 

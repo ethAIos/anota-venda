@@ -65,7 +65,7 @@ fun PaperInput(
         fontWeight = if (big) FontWeight.ExtraBold else FontWeight.SemiBold,
         fontSize = if (big) 32.sp else 18.sp,
         color = if (value.isNotEmpty()) Ink else InkSoft,
-        letterSpacing = if (big) (-1).sp else (-0.1).sp,
+        letterSpacing = 0.sp,
     )
     Column(modifier) {
         Row(

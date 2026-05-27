@@ -1,8 +1,12 @@
 package com.caderninho.vendas.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -32,8 +36,12 @@ fun PaperScaffold(
             bottomBar = bottomBar,
             snackbarHost = { SnackbarHost(snackbarHostState) },
             floatingActionButton = floatingActionButton,
+            contentWindowInsets = WindowInsets.safeDrawing,
         ) { padding ->
             content(padding)
         }
     }
 }
+
+fun Modifier.paperScaffoldContentPadding(padding: PaddingValues): Modifier =
+    padding(padding).consumeWindowInsets(padding)

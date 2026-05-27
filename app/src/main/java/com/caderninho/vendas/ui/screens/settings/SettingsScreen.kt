@@ -3,20 +3,15 @@ package com.caderninho.vendas.ui.screens.settings
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
@@ -26,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,11 +41,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.caderninho.vendas.BuildConfig
 import com.caderninho.vendas.ui.components.BrandMark
 import com.caderninho.vendas.ui.components.FieldLabel
+import com.caderninho.vendas.ui.components.PaperDialogActions
+import com.caderninho.vendas.ui.components.PaperIconButton
+import com.caderninho.vendas.ui.components.PaperListRow
 import com.caderninho.vendas.ui.components.PaperScaffold
 import com.caderninho.vendas.ui.components.PaperTopBar
 import com.caderninho.vendas.ui.components.PrimaryButton
-import com.caderninho.vendas.ui.components.PrimaryColor
 import com.caderninho.vendas.ui.components.TopBarLeading
+import com.caderninho.vendas.ui.components.paperScaffoldContentPadding
 import com.caderninho.vendas.ui.theme.Ink
 import com.caderninho.vendas.ui.theme.InkSoft
 import com.caderninho.vendas.ui.theme.NunitoFamily
@@ -86,7 +83,7 @@ fun SettingsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .paperScaffoldContentPadding(padding)
                 .padding(horizontal = 22.dp),
         ) {
             Spacer(modifier = Modifier.size(12.dp))
@@ -98,25 +95,21 @@ fun SettingsScreen(
                     .clip(RoundedCornerShape(12.dp))
                     .background(PaperAlt)
                     .border(1.dp, Rule, RoundedCornerShape(12.dp))
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                    .padding(start = 16.dp, top = 14.dp, end = 62.dp, bottom = 14.dp),
             ) {
                 Text(
                     text = template,
                     color = Ink,
                     style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Medium, fontSize = 15.sp, lineHeight = 23.sp),
                 )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Paper)
-                        .border(1.dp, Rule, RoundedCornerShape(8.dp))
-                        .clickable { showEditDialog = true },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(Icons.Default.Edit, contentDescription = "Editar", tint = InkSoft, modifier = Modifier.size(15.dp))
-                }
+                PaperIconButton(
+                    icon = Icons.Default.Edit,
+                    contentDescription = "Editar mensagem",
+                    onClick = { showEditDialog = true },
+                    tint = InkSoft,
+                    containerColor = Paper,
+                    modifier = Modifier.align(Alignment.TopEnd),
+                )
             }
             Text(
                 "usamos {nome}, {produto}, {valor} e {data} para preencher.",
@@ -207,13 +200,14 @@ fun SettingsScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = {
-                    vm.saveTemplate(draft)
-                    showEditDialog = false
-                }) { Text("Salvar") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showEditDialog = false }) { Text("Cancelar") }
+                PaperDialogActions(
+                    onDismiss = { showEditDialog = false },
+                    confirmText = "Salvar",
+                    onConfirm = {
+                        vm.saveTemplate(draft)
+                        showEditDialog = false
+                    },
+                )
             },
             containerColor = Paper,
         )
@@ -230,22 +224,17 @@ fun SettingsScreen(
                 )
             },
             confirmButton = {
-                Box(modifier = Modifier.padding(end = 8.dp)) {
-                    PrimaryButton(
-                        text = "Apagar tudo",
-                        color = PrimaryColor.RED,
-                        fillWidth = false,
-                        onClick = {
-                            vm.clearAllData {
-                                scope.launch { snackbarHostState.showSnackbar("Tudo limpo") }
-                            }
-                            showClearDialog = false
-                        },
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showClearDialog = false }) { Text("Cancelar") }
+                PaperDialogActions(
+                    onDismiss = { showClearDialog = false },
+                    confirmText = "Apagar tudo",
+                    destructive = true,
+                    onConfirm = {
+                        vm.clearAllData {
+                            scope.launch { snackbarHostState.showSnackbar("Tudo limpo") }
+                        }
+                        showClearDialog = false
+                    },
+                )
             },
             containerColor = Paper,
             textContentColor = Ink,
@@ -265,7 +254,11 @@ fun SettingsScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = { showAboutDialog = false }) { Text("OK") }
+                PrimaryButton(
+                    text = "OK",
+                    fillWidth = false,
+                    onClick = { showAboutDialog = false },
+                )
             },
             containerColor = Paper,
         )
@@ -279,39 +272,21 @@ private fun SettingsRow(
     subtitle: String,
     onClick: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(PaperAlt)
-            .border(1.dp, Rule, RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(Paper)
-                .border(1.dp, Rule, RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(icon, contentDescription = null, tint = InkSoft, modifier = Modifier.size(18.dp))
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                title,
-                color = Ink,
-                style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.Bold, fontSize = 14.5.sp),
-            )
-            Text(
-                subtitle,
-                color = InkSoft,
-                style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp),
-            )
-        }
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = InkSoft, modifier = Modifier.size(18.dp))
-    }
+    PaperListRow(
+        title = title,
+        subtitle = subtitle,
+        onClick = onClick,
+        leading = {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Paper)
+                    .border(1.dp, Rule, RoundedCornerShape(10.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(icon, contentDescription = null, tint = InkSoft, modifier = Modifier.size(20.dp))
+            }
+        },
+    )
 }

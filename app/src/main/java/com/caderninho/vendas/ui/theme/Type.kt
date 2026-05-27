@@ -45,7 +45,7 @@ val LocalCaveatStyle = compositionLocalOf { CaveatStyle }
 val CaderninhoTypography: Typography = run {
     val base = Typography()
     Typography(
-        displayLarge = base.displayLarge.copy(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.6).sp),
+        displayLarge = base.displayLarge.copy(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold),
         displayMedium = base.displayMedium.copy(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold),
         displaySmall = base.displaySmall.copy(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold),
         headlineLarge = base.headlineLarge.copy(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold),

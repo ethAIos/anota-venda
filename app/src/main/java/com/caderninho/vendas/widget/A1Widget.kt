@@ -60,9 +60,9 @@ private fun A1Content() {
             Row(modifier = GlanceModifier.fillMaxWidth()) {
                 Box(
                     modifier = GlanceModifier
-                        .size(30.dp)
+                        .size(44.dp)
                         .background(ColorProvider(Green))
-                        .cornerRadius(15.dp),
+                        .cornerRadius(12.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -70,7 +70,7 @@ private fun A1Content() {
                         style = TextStyle(
                             color = ColorProvider(Paper),
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
+                            fontSize = 24.sp,
                         ),
                     )
                 }

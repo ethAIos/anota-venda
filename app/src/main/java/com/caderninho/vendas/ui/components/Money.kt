@@ -45,7 +45,7 @@ fun Money(
             fontFamily = NunitoFamily,
             fontWeight = weight,
             fontSize = size,
-            letterSpacing = (-0.2).sp,
+            letterSpacing = 0.sp,
             fontFeatureSettings = "tnum",
         ),
     )

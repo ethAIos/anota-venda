@@ -171,7 +171,7 @@ private fun A2Row(row: PayingTodayRow) {
         modifier = GlanceModifier
             .fillMaxWidth()
             .clickable(actionStartActivity(deepLinkIntent(context, "receive/${row.installment.id}")))
-            .padding(vertical = 6.dp),
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -195,9 +195,9 @@ private fun A2Row(row: PayingTodayRow) {
         Spacer(modifier = GlanceModifier.size(8.dp))
         Box(
             modifier = GlanceModifier
-                .size(26.dp)
+                .size(40.dp)
                 .background(ColorProvider(GreenSoft))
-                .cornerRadius(13.dp)
+                .cornerRadius(12.dp)
                 .clickable(actionRunCallback<MarkPaidAction>(
                     actionParametersOf(MarkPaidAction.IdKey to row.installment.id)
                 )),
@@ -208,7 +208,7 @@ private fun A2Row(row: PayingTodayRow) {
                 style = TextStyle(
                     color = ColorProvider(Green),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp,
+                    fontSize = 18.sp,
                 ),
             )
         }

@@ -1,7 +1,6 @@
 package com.caderninho.vendas.ui.screens.order
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,11 +17,9 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -30,9 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,6 +36,9 @@ import com.caderninho.vendas.data.db.entities.InstallmentEntity
 import com.caderninho.vendas.ui.components.GhostButton
 import com.caderninho.vendas.ui.components.GhostColor
 import com.caderninho.vendas.ui.components.MoneyVisualTransformation
+import com.caderninho.vendas.ui.components.PaperBottomSheetActionRow
+import com.caderninho.vendas.ui.components.PaperDialogActions
+import com.caderninho.vendas.ui.components.PaperSheetContent
 import com.caderninho.vendas.ui.components.PrimaryButton
 import com.caderninho.vendas.ui.components.centsToDigits
 import com.caderninho.vendas.ui.components.digitsToCents
@@ -53,9 +51,9 @@ import com.caderninho.vendas.ui.theme.Red
 import com.caderninho.vendas.ui.theme.Rule
 import com.caderninho.vendas.util.describeDue
 import com.caderninho.vendas.util.formatDayMonth
-import java.time.Instant
+import com.caderninho.vendas.util.toDatePickerLocalDate
+import com.caderninho.vendas.util.toDatePickerMillis
 import java.time.LocalDate
-import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,13 +77,7 @@ fun InstallmentActionsSheet(
         sheetState = sheetState,
         containerColor = Paper,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 22.dp, vertical = 12.dp)
-                .padding(bottom = 28.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
+        PaperSheetContent {
             Column {
                 Text(
                     "PARCELA ${inst.number}/${inst.ofTotal}",
@@ -105,7 +97,7 @@ fun InstallmentActionsSheet(
                         fontFamily = NunitoFamily,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
-                        letterSpacing = (-0.3).sp,
+                        letterSpacing = 0.sp,
                     ),
                 )
                 val statusText = if (paid) "pago em ${formatDayMonth(inst.paidAt!!)}"
@@ -175,14 +167,14 @@ fun InstallmentActionsSheet(
             } else {
                 Column {
                     if (!paid) {
-                        ActionRow(
+                        PaperBottomSheetActionRow(
                             icon = Icons.Default.CalendarToday,
                             label = "Adiar vencimento",
                             color = Ink,
                             onClick = { showDatePicker = true },
                         )
                         Divider()
-                        ActionRow(
+                        PaperBottomSheetActionRow(
                             icon = Icons.Default.Edit,
                             label = "Editar valor",
                             color = Ink,
@@ -190,10 +182,11 @@ fun InstallmentActionsSheet(
                         )
                     }
                     if (paid) {
-                        ActionRow(
+                        PaperBottomSheetActionRow(
                             icon = Icons.AutoMirrored.Filled.Undo,
                             label = "Desmarcar como pago",
                             color = Red,
+                            destructive = true,
                             onClick = {
                                 onUnmarkPaid()
                                 onDismiss()
@@ -206,23 +199,21 @@ fun InstallmentActionsSheet(
     }
 
     if (showDatePicker) {
-        val initialMillis = inst.dueDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val initialMillis = inst.dueDate.toDatePickerMillis()
         val state = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
-                TextButton(onClick = {
-                    state.selectedDateMillis?.let { millis ->
-                        val date = Instant.ofEpochMilli(millis)
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate()
-                        onPostpone(date)
-                    }
-                    showDatePicker = false
-                }) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
+                PaperDialogActions(
+                    onDismiss = { showDatePicker = false },
+                    confirmText = "OK",
+                    onConfirm = {
+                        state.selectedDateMillis?.let { millis ->
+                            onPostpone(millis.toDatePickerLocalDate())
+                        }
+                        showDatePicker = false
+                    },
+                )
             },
             colors = androidx.compose.material3.DatePickerDefaults.colors(
                 containerColor = Paper,
@@ -230,34 +221,6 @@ fun InstallmentActionsSheet(
         ) {
             DatePicker(state = state)
         }
-    }
-}
-
-@Composable
-private fun ActionRow(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    color: Color,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
-        Text(
-            label,
-            color = color,
-            style = TextStyle(
-                fontFamily = NunitoFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp,
-            ),
-        )
     }
 }
 
@@ -270,4 +233,3 @@ private fun Divider() {
             .background(Rule),
     )
 }
-

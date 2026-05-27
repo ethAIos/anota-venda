@@ -3,7 +3,6 @@ package com.caderninho.vendas.ui.screens.order
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
@@ -27,13 +27,10 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,14 +62,17 @@ import com.caderninho.vendas.ui.components.GhostButton
 import com.caderninho.vendas.ui.components.GhostColor
 import com.caderninho.vendas.ui.components.Money
 import com.caderninho.vendas.ui.components.MoneyVisualTransformation
+import com.caderninho.vendas.ui.components.PaperDialogActions
+import com.caderninho.vendas.ui.components.PaperIconButton
+import com.caderninho.vendas.ui.components.PaperInteractiveSurface
 import com.caderninho.vendas.ui.components.PaperScaffold
 import com.caderninho.vendas.ui.components.PaperTopBar
 import com.caderninho.vendas.ui.components.PrimaryButton
-import com.caderninho.vendas.ui.components.PrimaryColor
 import com.caderninho.vendas.ui.components.TopBarLeading
 import com.caderninho.vendas.ui.components.centsToDigits
 import com.caderninho.vendas.ui.components.digitsToCents
 import com.caderninho.vendas.ui.components.formatBrl
+import com.caderninho.vendas.ui.components.paperScaffoldContentPadding
 import com.caderninho.vendas.ui.theme.Green
 import com.caderninho.vendas.ui.theme.GreenSoft
 import com.caderninho.vendas.ui.theme.Ink
@@ -85,9 +85,9 @@ import com.caderninho.vendas.ui.theme.Rule
 import com.caderninho.vendas.ui.theme.RuleStrong
 import com.caderninho.vendas.util.describeDue
 import com.caderninho.vendas.util.formatDayMonth
-import java.time.Instant
+import com.caderninho.vendas.util.toDatePickerLocalDate
+import com.caderninho.vendas.util.toDatePickerMillis
 import java.time.LocalDate
-import java.time.ZoneId
 
 @Composable
 fun OrderDetailScreen(
@@ -118,9 +118,7 @@ fun OrderDetailScreen(
                 leading = TopBarLeading.BACK,
                 onLeading = onBack,
                 actions = {
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Mais", tint = Ink)
-                    }
+                    PaperIconButton(Icons.Default.MoreVert, "Mais", { showMenu = true })
                     DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false },
@@ -173,7 +171,7 @@ fun OrderDetailScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .paperScaffoldContentPadding(padding),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 22.dp, end = 22.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
@@ -188,7 +186,7 @@ fun OrderDetailScreen(
                         d.order.what,
                         color = Ink,
                         modifier = Modifier.padding(top = 2.dp),
-                        style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp, letterSpacing = (-0.4).sp),
+                        style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp, letterSpacing = 0.sp),
                     )
                     Text(
                         "anotado em ${formatDayMonth(d.order.createdAt)} · $installmentLabel",
@@ -418,19 +416,16 @@ private fun EditOrderDialog(
                         ),
                     )
                 }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(1.dp, Rule, RoundedCornerShape(8.dp))
-                        .clickable { showDatePicker = true }
-                        .padding(horizontal = 14.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                PaperInteractiveSurface(
+                    onClick = { showDatePicker = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    containerColor = PaperAlt,
+                    shape = RoundedCornerShape(8.dp),
                 ) {
                     Text(
                         "Data do pedido",
                         color = InkSoft,
+                        modifier = Modifier.weight(1f),
                         style = TextStyle(
                             fontFamily = NunitoFamily,
                             fontWeight = FontWeight.SemiBold,
@@ -446,6 +441,7 @@ private fun EditOrderDialog(
                             fontSize = 14.sp,
                         ),
                     )
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = InkSoft, modifier = Modifier.size(20.dp))
                 }
                 OutlinedTextField(
                     value = draftObservation,
@@ -468,8 +464,11 @@ private fun EditOrderDialog(
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = {
+            PaperDialogActions(
+                onDismiss = onDismiss,
+                confirmText = "Salvar",
+                confirmEnabled = saveEnabled,
+                onConfirm = {
                     onSave(
                         draftWhat,
                         draftObservation,
@@ -477,11 +476,7 @@ private fun EditOrderDialog(
                         if (canEditTotal) parsedTotal else totalCents,
                     )
                 },
-                enabled = saveEnabled,
-            ) { Text("Salvar") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            )
         },
         containerColor = Paper,
         textContentColor = Ink,
@@ -489,22 +484,21 @@ private fun EditOrderDialog(
     )
 
     if (showDatePicker) {
-        val initialMillis = draftDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val initialMillis = draftDate.toDatePickerMillis()
         val state = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
-                TextButton(onClick = {
-                    state.selectedDateMillis?.let { millis ->
-                        draftDate = Instant.ofEpochMilli(millis)
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate()
-                    }
-                    showDatePicker = false
-                }) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
+                PaperDialogActions(
+                    onDismiss = { showDatePicker = false },
+                    confirmText = "OK",
+                    onConfirm = {
+                        state.selectedDateMillis?.let { millis ->
+                            draftDate = millis.toDatePickerLocalDate()
+                        }
+                        showDatePicker = false
+                    },
+                )
             },
             colors = DatePickerDefaults.colors(containerColor = Paper),
         ) {
@@ -529,17 +523,12 @@ private fun DeleteOrderDialog(
             )
         },
         confirmButton = {
-            Box(modifier = Modifier.padding(end = 8.dp)) {
-                PrimaryButton(
-                    text = "Excluir",
-                    color = PrimaryColor.RED,
-                    fillWidth = false,
-                    onClick = onConfirm,
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            PaperDialogActions(
+                onDismiss = onDismiss,
+                confirmText = "Excluir",
+                destructive = true,
+                onConfirm = onConfirm,
+            )
         },
         containerColor = Paper,
         textContentColor = Ink,
@@ -554,21 +543,17 @@ private fun InstallmentRow(
     onMarkPaid: () -> Unit,
 ) {
     val paid = inst.paidAt != null
-    Row(
+    PaperInteractiveSurface(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(Paper)
-            .border(1.dp, Rule, RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 12.dp)
             .let { if (paid) it.alpha(0.7f) else it },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        containerColor = Paper,
+        shape = RoundedCornerShape(12.dp),
     ) {
         Box(
             modifier = Modifier
-                .size(32.dp)
+                .size(48.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(if (paid) GreenSoft else PaperAlt)
                 .border(if (paid) 0.dp else 1.dp, Rule, RoundedCornerShape(8.dp)),
@@ -609,23 +594,13 @@ private fun InstallmentRow(
             size = 15.sp,
         )
         if (!paid) {
-            Spacer(modifier = Modifier.size(8.dp))
-            FilledTonalButton(
+            PrimaryButton(
+                text = "Recebi",
                 onClick = onMarkPaid,
-                colors = androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
-                    containerColor = GreenSoft,
-                    contentColor = Green,
-                ),
-                shape = RoundedCornerShape(8.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-            ) {
-                Text(
-                    "Recebi",
-                    color = Green,
-                    style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp),
-                )
-            }
+                fillWidth = false,
+            )
         }
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = InkSoft, modifier = Modifier.size(20.dp))
     }
 }
 

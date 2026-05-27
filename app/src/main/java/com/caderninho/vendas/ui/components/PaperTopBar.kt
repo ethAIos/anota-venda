@@ -6,7 +6,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -35,18 +34,14 @@ fun PaperTopBar(
                     fontFamily = NunitoFamily,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 17.sp,
-                    letterSpacing = (-0.2).sp,
+                    letterSpacing = 0.sp,
                 ),
             )
         },
         navigationIcon = {
             when (leading) {
-                TopBarLeading.CLOSE -> IconButton(onClick = onLeading) {
-                    Icon(Icons.Default.Close, contentDescription = "Fechar", tint = Ink)
-                }
-                TopBarLeading.BACK -> IconButton(onClick = onLeading) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar", tint = Ink)
-                }
+                TopBarLeading.CLOSE -> PaperIconButton(Icons.Default.Close, "Fechar", onLeading)
+                TopBarLeading.BACK -> PaperIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Voltar", onLeading)
                 TopBarLeading.NONE -> Unit
             }
         },
