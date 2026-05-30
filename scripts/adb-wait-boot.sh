@@ -12,9 +12,9 @@ for _ in $(seq 1 120); do
   boot="$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
   if [[ "$boot" == "1" ]]; then
     echo "Boot complete."
-  adb shell settings put global window_animation_scale 0 >/dev/null 2>&1 || true
-  adb shell settings put global transition_animation_scale 0 >/dev/null 2>&1 || true
-  adb shell settings put global animator_duration_scale 0 >/dev/null 2>&1 || true
+    adb shell settings put global window_animation_scale 0 >/dev/null 2>&1 || true
+    adb shell settings put global transition_animation_scale 0 >/dev/null 2>&1 || true
+    adb shell settings put global animator_duration_scale 0 >/dev/null 2>&1 || true
     exit 0
   fi
   sleep 5
