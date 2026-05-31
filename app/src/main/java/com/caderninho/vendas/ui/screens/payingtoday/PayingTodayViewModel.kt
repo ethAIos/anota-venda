@@ -9,8 +9,9 @@ import com.caderninho.vendas.util.WhatsAppLauncher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.first
@@ -61,6 +62,9 @@ class PayingTodayViewModel @Inject constructor(
     private val pickerOpen = MutableStateFlow(false)
     private val searchOpen = MutableStateFlow(false)
     private val query = MutableStateFlow("")
+    private val receiveRowOverride = MutableStateFlow<PayingTodayRow?>(null)
+
+    val receiveRowForDeepLink: StateFlow<PayingTodayRow?> = receiveRowOverride.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val weekRows = weekStart.flatMapLatest { start ->
@@ -152,8 +156,23 @@ class PayingTodayViewModel @Inject constructor(
         query.value = value
     }
 
+    fun openReceiveInstallment(installmentId: Long) {
+        viewModelScope.launch {
+            val row = repo.getPayingTodayRow(installmentId) ?: return@launch
+            receiveRowOverride.value = row
+            selectDate(row.installment.dueDate)
+        }
+    }
+
+    fun clearReceiveInstallment() {
+        receiveRowOverride.value = null
+    }
+
     fun markPaid(installmentId: Long) {
-        viewModelScope.launch { repo.markPaid(installmentId) }
+        viewModelScope.launch {
+            repo.markPaid(installmentId)
+            receiveRowOverride.value = null
+        }
     }
 
     fun postpone(installmentId: Long, days: Long = 7L) {
