@@ -104,9 +104,8 @@ $results = @()
 
 Write-Host "Widget device QA -> $OutputDir"
 
-try {
-    Invoke-Adb shell pm list packages $Package | Out-Null
-} catch {
+$packages = Invoke-Adb shell pm list packages $Package
+if (-not ($packages | Where-Object { $_ -eq "package:$Package" })) {
     throw "Package $Package not installed on $Serial"
 }
 
