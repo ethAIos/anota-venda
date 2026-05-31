@@ -32,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -97,7 +98,14 @@ fun PayingTodayScreen(
     var receiveInstallmentId by rememberSaveable(initialReceiveInstallmentId) {
         mutableStateOf(initialReceiveInstallmentId)
     }
+    val receiveRowOverride by vm.receiveRowForDeepLink.collectAsStateWithLifecycle()
+    LaunchedEffect(initialReceiveInstallmentId) {
+        val id = initialReceiveInstallmentId ?: return@LaunchedEffect
+        receiveInstallmentId = id
+        vm.openReceiveInstallment(id)
+    }
     val receiveRow = state.rows.firstOrNull { it.installment.id == receiveInstallmentId }
+        ?: receiveRowOverride?.takeIf { it.installment.id == receiveInstallmentId }
     val overdueDays = ChronoUnit.DAYS.between(state.selectedDate, state.today)
     val showSearchEmpty = state.query.isNotBlank() && state.filteredRows.isEmpty()
 
@@ -189,8 +197,12 @@ fun PayingTodayScreen(
                 onConfirm = {
                     vm.markPaid(receiveRow.installment.id)
                     receiveInstallmentId = null
+                    vm.clearReceiveInstallment()
                 },
-                onDismiss = { receiveInstallmentId = null },
+                onDismiss = {
+                    receiveInstallmentId = null
+                    vm.clearReceiveInstallment()
+                },
             )
         }
     }

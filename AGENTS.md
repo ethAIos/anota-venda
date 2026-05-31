@@ -48,6 +48,26 @@ Onboarding: tap **“pular”** (top-right) → main screen **Cobranças**.
 
 Requires SDK packages: `system-images;android-34;google_atd;x86_64`, `emulator`, `platform-tools`.
 
+### Windows emulator + widget QA
+
+On a Windows host with Android Studio / SDK and Hyper-V or HAXM:
+
+```powershell
+# Create AVD once (default: caderninho_widget36, API 36 google_apis)
+.\scripts\create-android-avd.ps1
+
+# Start emulator and wait for boot
+.\scripts\android-emulator.ps1 -WaitForBoot
+
+# Install app + run widget/deep-link smoke tests
+$env:JAVA_HOME = 'C:\Program Files\Eclipse Adoptium\jdk-17.0.18.8-hotspot'
+.\scripts\verify-widgets-emulator-qa.ps1
+```
+
+`verify-widgets-emulator-qa.ps1` creates the AVD if missing, boots the emulator, runs `installDebug`, then `verify-widgets-device-qa.ps1` (demo seed loads on first launch).
+
+Physical device over Wi‑Fi ADB still works: `.\scripts\verify-widgets-device-qa.ps1 -Serial 192.168.x.x:port`.
+
 ### Gotchas
 
 - **Release signing** is optional (`CADERNINHO_RELEASE_*` in `local.properties` or env).

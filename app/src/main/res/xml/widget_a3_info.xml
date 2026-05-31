@@ -9,4 +9,4 @@
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
     android:description="@string/widget_a3_label"
-    android:previewImage="@drawable/widget_preview_a3_image" />
+    android:previewImage="@drawable/widget_preview_a3" />

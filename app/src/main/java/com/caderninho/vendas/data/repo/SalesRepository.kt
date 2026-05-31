@@ -67,6 +67,15 @@ class SalesRepository @Inject constructor(
 
     suspend fun getCustomer(id: Long): CustomerEntity? = customerDao.getById(id)
 
+    /** Unpaid installment with order/customer for receive sheet (any due date). */
+    suspend fun getPayingTodayRow(installmentId: Long): PayingTodayRow? {
+        val installment = installmentDao.getById(installmentId) ?: return null
+        if (installment.paidAt != null) return null
+        val order = orderDao.getById(installment.orderId) ?: return null
+        val customer = customerDao.getById(order.customerId) ?: return null
+        return PayingTodayRow(installment, order, customer)
+    }
+
     fun observePayingToday(today: LocalDate = LocalDate.now()): Flow<List<PayingTodayRow>> =
         combine(
             installmentDao.observeDueOn(today),
