@@ -2,6 +2,7 @@ package com.caderninho.vendas.widget
 
 import android.content.Context
 import com.caderninho.vendas.data.repo.SalesRepository
+import com.caderninho.vendas.demo.DemoLockPolicy
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -11,7 +12,11 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 interface WidgetEntryPoint {
     fun salesRepository(): SalesRepository
+    fun demoLockPolicy(): DemoLockPolicy
 }
 
 fun Context.widgetRepo(): SalesRepository =
     EntryPointAccessors.fromApplication(applicationContext, WidgetEntryPoint::class.java).salesRepository()
+
+fun Context.widgetDemoLockPolicy(): DemoLockPolicy =
+    EntryPointAccessors.fromApplication(applicationContext, WidgetEntryPoint::class.java).demoLockPolicy()

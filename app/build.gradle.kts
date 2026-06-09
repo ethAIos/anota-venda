@@ -31,6 +31,25 @@ val hasReleaseSigning = listOf(
     releaseKeyPassword,
 ).all { !it.isNullOrBlank() }
 
+val demoLockRaw = signingProperty("CADERNINHO_DEMO_LOCK")
+val demoLockMillis: Long = when {
+    demoLockRaw.isNullOrBlank() || demoLockRaw == "0" -> 0L
+    else -> {
+        val match = Regex("""^(\d+)([dhm])$""").matchEntire(demoLockRaw.trim())
+            ?: error("CADERNINHO_DEMO_LOCK deve ser 0 ou <numero><d|h|m>. Recebido: '$demoLockRaw'")
+        val (value, unit) = match.destructured
+        val amount = value.toLongOrNull()
+            ?: error("CADERNINHO_DEMO_LOCK valor inválido: '$value'")
+        require(amount > 0) { "CADERNINHO_DEMO_LOCK deve ser > 0 quando habilitado. Recebido: $amount" }
+        when (unit) {
+            "d" -> amount * 24 * 60 * 60 * 1000
+            "h" -> amount * 60 * 60 * 1000
+            "m" -> amount * 60 * 1000
+            else -> error("Unidade inválida: $unit")
+        }
+    }
+}
+
 android {
     namespace = "com.caderninho.vendas"
     compileSdk = 35
@@ -43,6 +62,8 @@ android {
         versionName = "1.0.2"
 
         vectorDrawables { useSupportLibrary = true }
+
+        buildConfigField("long", "DEMO_LOCK_MILLIS", "${demoLockMillis}L")
     }
 
     signingConfigs {

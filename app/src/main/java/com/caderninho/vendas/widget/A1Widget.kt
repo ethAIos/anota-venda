@@ -25,33 +25,38 @@ class A1Widget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Single
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        provideContent { A1Content() }
+        val expired = context.isDemoExpired()
+        provideContent { A1Content(expired = expired) }
     }
 }
 
 @Composable
-private fun A1Content() {
+private fun A1Content(expired: Boolean = false) {
     val context = LocalContext.current
     WidgetCard(
         padding = WidgetSmallPadding,
-        action = actionStartActivity(deepLinkIntent(context, "newsale")),
+        action = if (expired) null else actionStartActivity(deepLinkIntent(context, "newsale")),
     ) {
-        Column(modifier = GlanceModifier.fillMaxSize()) {
-            Row(modifier = GlanceModifier.fillMaxWidth()) {
-                WidgetAddMark()
+        if (expired) {
+            WidgetExpiredState()
+        } else {
+            Column(modifier = GlanceModifier.fillMaxSize()) {
+                Row(modifier = GlanceModifier.fillMaxWidth()) {
+                    WidgetAddMark()
+                    Spacer(modifier = GlanceModifier.defaultWeight())
+                    WidgetBrand()
+                }
                 Spacer(modifier = GlanceModifier.defaultWeight())
-                WidgetBrand()
-            }
-            Spacer(modifier = GlanceModifier.defaultWeight())
-            Column {
-                Text(
-                    "Anotar venda",
-                    style = widgetTitleStyle(fontSize = 16.sp),
-                )
-                Text(
-                    "toque para registrar",
-                    style = widgetMetaStyle(fontSize = 11.sp),
-                )
+                Column {
+                    Text(
+                        "Anotar venda",
+                        style = widgetTitleStyle(fontSize = 16.sp),
+                    )
+                    Text(
+                        "toque para registrar",
+                        style = widgetMetaStyle(fontSize = 11.sp),
+                    )
+                }
             }
         }
     }

@@ -33,6 +33,7 @@ class WidgetRefreshWorker @AssistedInject constructor(
         private val RefreshTime = LocalTime.of(0, 1)
 
         fun enqueue(context: Context) {
+            if (context.isDemoExpired()) return
             val request = PeriodicWorkRequestBuilder<WidgetRefreshWorker>(1, TimeUnit.DAYS)
                 .setInitialDelay(millisUntilNextRefresh(), TimeUnit.MILLISECONDS)
                 .build()

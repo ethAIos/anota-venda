@@ -143,6 +143,29 @@ internal fun WidgetEmptyState(title: String, accent: String) {
 }
 
 @Composable
+internal fun WidgetExpiredState() {
+    Column(
+        modifier = GlanceModifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            "Demo expirada",
+            style = widgetTitleStyle(fontSize = 14.sp),
+        )
+        Text(
+            "Tempo limite encerrado.",
+            style = TextStyle(
+                color = ColorProvider(Red),
+                fontStyle = FontStyle.Italic,
+                fontWeight = FontWeight.Medium,
+                fontSize = 12.sp,
+            ),
+        )
+    }
+}
+
+@Composable
 internal fun WidgetStatusDot(status: OrderStatus) {
     Box(
         modifier = GlanceModifier

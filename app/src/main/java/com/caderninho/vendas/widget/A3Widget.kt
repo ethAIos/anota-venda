@@ -34,6 +34,11 @@ class A3Widget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Single
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val expired = context.isDemoExpired()
+        if (expired) {
+            provideContent { A3ExpiredContent() }
+            return
+        }
         val repo = context.widgetRepo()
         val today = LocalDate.now()
         val rows = runCatching {
@@ -41,6 +46,13 @@ class A3Widget : GlanceAppWidget() {
         }.getOrElse { emptyList() }
         val total = rows.sumOf { it.installment.amountCents }
         provideContent { A3Content(rows.sortedForTriage().take(4), total, today) }
+    }
+}
+
+@Composable
+private fun A3ExpiredContent() {
+    WidgetCard {
+        WidgetExpiredState()
     }
 }
 

@@ -15,10 +15,16 @@ class BootReceiver : BroadcastReceiver() {
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
         scope.launch {
             try {
-                WidgetRefreshWorker.enqueue(context)
-                A1Widget().updateAll(context)
-                A2Widget().updateAll(context)
-                A3Widget().updateAll(context)
+                if (context.isDemoExpired()) {
+                    A1Widget().updateAll(context)
+                    A2Widget().updateAll(context)
+                    A3Widget().updateAll(context)
+                } else {
+                    WidgetRefreshWorker.enqueue(context)
+                    A1Widget().updateAll(context)
+                    A2Widget().updateAll(context)
+                    A3Widget().updateAll(context)
+                }
             } finally {
                 pending.finish()
             }

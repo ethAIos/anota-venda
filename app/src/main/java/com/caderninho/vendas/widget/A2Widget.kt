@@ -33,6 +33,11 @@ class A2Widget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Single
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val expired = context.isDemoExpired()
+        if (expired) {
+            provideContent { A2ExpiredContent() }
+            return
+        }
         val repo = context.widgetRepo()
         val today = LocalDate.now()
         val rows: List<PayingTodayRow> = runCatching {
@@ -42,6 +47,13 @@ class A2Widget : GlanceAppWidget() {
         provideContent {
             A2Content(rows = rows.take(3), total = total, today = today, rowCount = rows.size)
         }
+    }
+}
+
+@Composable
+private fun A2ExpiredContent() {
+    WidgetCard {
+        WidgetExpiredState()
     }
 }
 
